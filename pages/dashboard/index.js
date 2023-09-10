@@ -1,5 +1,4 @@
 import {useUser} from "../../context/user";
-import Container from "@mui/material/Container";
 import withProtected from "../../hoc/withProtected"
 import AuthLayout from '../../components/Layout/Authenticated'
 

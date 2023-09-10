@@ -8,7 +8,6 @@ import Checkbox from '@mui/material/Checkbox'
 import Typography from '@mui/material/Typography'
 import InputAdornment from '@mui/material/InputAdornment'
 import FormControl from '@mui/material/FormControl'
-import FormHelperText from '@mui/material/FormHelperText'
 import Modal from '@mui/material/Modal'
 import TextField from '@mui/material/TextField'
 import FormError from '../../Forms/Error';
