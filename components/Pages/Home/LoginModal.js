@@ -11,7 +11,7 @@ import FormControl from '@mui/material/FormControl'
 import FormHelperText from '@mui/material/FormHelperText'
 import Modal from '@mui/material/Modal'
 import TextField from '@mui/material/TextField'
-import FormError from '../../../Forms/Error';
+import FormError from '../../Forms/Error';
 import { SignIn, GetSignInErrorMessage } from '../../../services/firebase'
 
 const style = {
