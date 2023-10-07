@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography'
 import InputAdornment from '@mui/material/InputAdornment'
 import FormControl from '@mui/material/FormControl'
 import Modal from '@mui/material/Modal'
+import CircularProgress from '@mui/material/CircularProgress'
+import { Alert, Snackbar } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import FormError from '../../Forms/Error';
 import { SignIn, GetSignInErrorMessage } from '../../../services/firebase'
@@ -26,112 +28,148 @@ const style = {
 
 const LoginModal = ({ open, CloseModal }) => {
   const [showPassword, setShowPassword] = useState(false)
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' })
+  const [isLoading, setIsLoading] = useState(false)
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (values) => {
-    const {email, password} = values
+    setIsLoading(true)
+    const { email, password } = values
     try {
       await SignIn(email, password)
     } catch (error) {
       const message = GetSignInErrorMessage(error.code)
-      console.log(message)
+      setSnackbar({ open: true, message })
+      setIsLoading(false)
     }
   }
 
-  return (
-    <Modal
-      open={open}
-      onClose={CloseModal}
-    >
-      <Box sx={style}>
-        <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
-          Sign in
-        </Typography>
-        <Grid sx={{ mb: 2 }}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FormControl sx={{ mb: 2 }} fullWidth>
-              <TextField
-                id="email"
-                type="email"
-                name="email"
-                label="Email atau nomor telepon"
-                variant="filled"
-                {...register("email", { required: true })}
+  const onSnackbarClose = (event, reason) => {
+    console.log({ reason });
+    if (reason === 'clickaway') {
+      return
+    }
+    setSnackbar({ open: false, message: '' })
+  }
 
-              />
-              <FormError error={errors.email}/>
-            </FormControl>
-            <FormControl sx={{ mb: 4 }} fullWidth>
-              <TextField
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                label="Password"
-                variant="filled"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Button onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? 'Hide' : 'Show'}
-                      </Button>
-                    </InputAdornment>
-                  )
-                }}
-                {...register("password", { required: true, minLength: 8 })}
-              />
-              <FormError error={errors.password}/>
-            </FormControl>
-            <Button type="submit" variant="contained" size="large" fullWidth>
-              Sign in
-            </Button>
-          </form>
-        </Grid>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ mb: 1 }}
-        >
-          <Box>
-            <Checkbox />
-            <Typography variant="caption">
-              Remember me
+  return (
+    <>
+      <Modal
+        open={open}
+        onClose={CloseModal}
+      >
+        <Box sx={style}>
+          <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
+            Sign in
+          </Typography>
+          <Grid sx={{ mb: 2 }}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <FormControl sx={{ mb: 2 }} fullWidth>
+                <TextField
+                  id="email"
+                  type="email"
+                  name="email"
+                  label="Email atau nomor telepon"
+                  variant="filled"
+                  {...register("email", { required: true })}
+
+                />
+                <FormError error={errors.email} />
+              </FormControl>
+              <FormControl sx={{ mb: 4 }} fullWidth>
+                <TextField
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  label="Password"
+                  variant="filled"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Button onClick={() => setShowPassword(!showPassword)}>
+                          {showPassword ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputAdornment>
+                    )
+                  }}
+                  {...register("password", { required: true, minLength: 8 })}
+                />
+                <FormError error={errors.password} />
+              </FormControl>
+              <Button
+                disabled={isLoading}
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+              >
+                {isLoading && <CircularProgress size={20} sx={{ mr: 1 }} />}
+                Sign in
+              </Button>
+            </form>
+          </Grid>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ mb: 1 }}
+          >
+            <Box>
+              <Checkbox />
+              <Typography variant="caption">
+                Remember me
+              </Typography>
+            </Box>
+            <Typography variant="caption" component="a" href="#">
+              Need help ?
             </Typography>
-          </Box>
-          <Typography variant="caption" component="a" href="#">
-            Need help ?
-          </Typography>
-        </Grid>
-        <Grid container alignItems="center" sx={{ mb: 2 }}>
-          <Image
-            src="/__images/facebook.png"
-            height={20}
-            width={20}
-            layout="fixed"
-            alt="Facbook Login"
-          />
-          <Typography variant="caption" component="a" href="#" sx={{ ml: 1 }}>
-            Login with Facebook
-          </Typography>
-        </Grid>
-        <Grid>
-          <Typography variant="body1" component="span">
-            New to Netflix?
-          </Typography>
-          <Typography variant="body1" color="primary" component="a" href="#">
-            &nbsp;Sign up now.
-          </Typography>
-        </Grid>
-        <Grid>
-          <Typography variant="caption">
-            This page is protected by Google reCAPTCHA to ensure you are not a bot.
-          </Typography>
-          <Typography variant="caption" color="primary" component="a" href="#">
-            Learn more.
-          </Typography>
-        </Grid>
-      </Box>
-    </Modal>
+          </Grid>
+          <Grid container alignItems="center" sx={{ mb: 2 }}>
+            <Image
+              src="/__images/facebook.png"
+              height={20}
+              width={20}
+              layout="fixed"
+              alt="Facbook Login"
+            />
+            <Typography variant="caption" component="a" href="#" sx={{ ml: 1 }}>
+              Login with Facebook
+            </Typography>
+          </Grid>
+          <Grid>
+            <Typography variant="body1" component="span">
+              New to Netflix?
+            </Typography>
+            <Typography variant="body1" color="primary" component="a" href="#">
+              &nbsp;Sign up now.
+            </Typography>
+          </Grid>
+          <Grid>
+            <Typography variant="caption">
+              This page is protected by Google reCAPTCHA to ensure you are not a bot.
+            </Typography>
+            <Typography variant="caption" color="primary" component="a" href="#">
+              Learn more.
+            </Typography>
+          </Grid>
+        </Box>
+      </Modal>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={onSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={onSnackbarClose}
+          severity="error"
+          variant='filled'
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   )
 }
 
